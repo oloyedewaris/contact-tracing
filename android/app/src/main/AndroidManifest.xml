@@ -2,6 +2,9 @@
   package="com.contactraising">
 
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.CAMERA"/>
+    <uses-feature android:name="android.hardware.camera" android:required="false" />
+    <uses-feature android:name="android.hardware.camera.front" android:required="false" />
 
     <application
       android:name=".MainApplication"
@@ -10,6 +13,9 @@
       android:roundIcon="@mipmap/ic_launcher_round"
       android:allowBackup="false"
       android:theme="@style/AppTheme">
+      <meta-data
+        android:name="com.google.android.geo.API_KEY"
+        android:value="AIzaSyARIhsPviryH5cg_GVEomGltRo8fdfAG1E"/>
       <meta-data  android:name="com.dieam.reactnativepushnotification.notification_foreground"
                 android:value="false"/>
       <meta-data  android:name="com.dieam.reactnativepushnotification.notification_color"

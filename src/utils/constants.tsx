@@ -8,4 +8,4 @@ export const colors = {
   success: '#006400'
 }
 
-export const BACKEND_URL = 'https://waris-tracker-server.herokuapp.com/api'
+export const BACKEND_URL = 'https://contact-raising-server.onrender.com/api'

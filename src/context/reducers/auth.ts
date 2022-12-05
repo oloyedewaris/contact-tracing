@@ -1,9 +1,6 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {
-  LOGIN_USER,
-  REGISTER_USER,
-  NETWORK_LOADING,
-  NETWORK_ERROR,
+  SET_USER,
   LOGOUT_USER,
   INITIALIZE_APP,
   UPDATE_USER,
@@ -20,14 +17,11 @@ const auth = (state, action) => {
         appLoaded: true
       }
       return app
-    case REGISTER_USER:
-    case LOGIN_USER:
+    case SET_USER:
       app = {
         ...state,
         isAuthenticated: true,
         user: action.payload.user,
-        networkLoading: false,
-        networkError: null,
       }
       AsyncStorage.setItem('app', JSON.stringify(app))
       AsyncStorage.setItem('token', JSON.stringify(action.payload.token))
@@ -37,29 +31,13 @@ const auth = (state, action) => {
       app = {
         ...state,
         user: action.payload.user,
-        networkLoading: false,
-        networkError: null,
       }
       AsyncStorage.setItem('app', JSON.stringify(app))
       return app
-    case NETWORK_LOADING:
-      return {
-        ...state,
-        networkLoading: true,
-        networkError: null,
-      }
-    case NETWORK_ERROR:
-      return {
-        ...state,
-        networkLoading: false,
-        networkError: action.payload
-      }
     case LOGOUT_USER:
       app = {
         ...state,
         isAuthenticated: false,
-        networkLoading: false,
-        networkError: null,
         user: null,
         userProfileImage: null
       }

@@ -9,33 +9,37 @@ import { colors } from '../../utils/constants';
 // import getLocation from '../../getLocation';
 import { updateUser } from '../../context/actions/auth';
 import { GlobalContext } from '../../context/Provider';
+import axiosInstance from '../../utils/axiosInstance';
 
 const Map = ({ navigation }) => {
   const { authDispatch } = useContext(GlobalContext)
   const [locationName, setLocationName] = useState('')
   const [locationData, setLocationData] = useState(null)
 
-  // useEffect(() => {
-  //   getLocation(setLocationData, (location) => {
-  //     const geoApiKey = 'pk.7271c180015d2571b70b96cd69f894ec';
-  //     const latitude = location.latitude.toString()
-  //     const longitude = location.longitude.toString()
-  //     const fetchLocationUrl =
-  //       `https://eu1.locationiq.com/v1/reverse?key=${geoApiKey}&lat=${latitude}&lon=${longitude}&format=json`
-  //     axios.get(fetchLocationUrl)
-  //       .then(res => {
-  //         const { village, city, state, country } = res.data.address
-  //         setLocationName(village || city || state || country);
-  //         const locationData = {
-  //           location,
-  //           address: res.data,
-  //           time: Date.now()
-  //         }
-  //         updateUser(locationData)(authDispatch)
-  //       })
-  //       .catch(err => ToastAndroid.show('Failed to get and upload user location', ToastAndroid.SHORT))
-  //   })
-  // }, [])
+  useEffect(() => {
+    // getLocation(setLocationData, async (location) => {
+    //   const geoApiKey = 'pk.7271c180015d2571b70b96cd69f894ec';
+    //   const latitude = location.latitude.toString()
+    //   const longitude = location.longitude.toString()
+    //   const fetchLocationUrl =
+    //     `https://eu1.locationiq.com/v1/reverse?key=${geoApiKey}&lat=${latitude}&lon=${longitude}&format=json`
+    //   const addressDetails: any = await axios.get(fetchLocationUrl)
+
+    //   const { village, city, state, country } = addressDetails
+    //   setLocationName(village || city || state || country);
+    //   const locationData = {
+    //     location,
+    //     address: addressDetails,
+    //     time: Date.now()
+    //   }
+
+    //   axiosInstance.patch('/user/update', { locationData })
+    //     .then(res => {
+    //       updateUser(res.data)(authDispatch)
+    //     })
+    //     .catch(err => ToastAndroid.show('update location error', ToastAndroid.SHORT))
+    // })
+  }, [])
 
   return (
     <View style={styles.container}>

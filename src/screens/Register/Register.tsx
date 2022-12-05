@@ -7,13 +7,14 @@ import { GlobalContext } from '../../context/Provider';
 import CustomIcon from '../../components/Icon/CustomIcon';
 import CustomText from '../../components/Text/CustomText';
 import { colors } from '../../utils/constants';
-import { registerUser } from '../../context/actions/auth';
+import { setUser } from '../../context/actions/auth';
 import { useNavigation } from '@react-navigation/native';
 import normalize from '../../helpers/normalizeFont';
 import { moderateScale } from 'react-native-size-matters';
 import BottomSheet from '../../components/BottomSheet/BottomSheet'
 import ImagePicker from 'react-native-image-crop-picker';
 import { updateProfileImage } from '../../context/actions/auth';
+import axiosInstance from '../../utils/axiosInstance';
 
 
 const Register = () => {
@@ -22,6 +23,8 @@ const Register = () => {
   const navigation = useNavigation<any>()
   const { authState, authDispatch } = useContext<any>(GlobalContext)
   const [isPassword, setIsPassword] = useState(true)
+  const [error, setError] = useState(null)
+  const [loading, setLoading] = useState(false)
   const [name, setName] = useState({ body: '', error: null })
   const [email, setEmail] = useState({ body: '', error: null })
   const [password, setPassword] = useState({ body: '', error: null })
@@ -70,7 +73,17 @@ const Register = () => {
         password: password.body,
         image: 'gibberish'
       }
-      registerUser(userData)(authDispatch)
+      setLoading(true)
+      setError(null)
+      axiosInstance.post('/user/register', userData)
+        .then(res => {
+          setLoading(false)
+          setUser(res.data)(authDispatch)
+        })
+        .catch(err => {
+          setLoading(false)
+          setError(err.response?.data?.msg || 'Something went wrong, try again')
+        })
     }
   }
 
@@ -111,15 +124,15 @@ const Register = () => {
             </Pressable>
           }
           iconDirection='right' />
-        {authState.networkError && (
+        {error && (
           <CustomText style={{ textAlign: 'center', color: colors.danger }}>
-            {authState.networkError}
+            {error}
           </CustomText>
         )}
         <CustomButton
           type='primary'
-          loading={authState.networkLoading}
-          disabled={authState.networkLoading}
+          loading={loading}
+          disabled={loading}
           title='Sign Up'
           onPress={handleSubmit}
         />
