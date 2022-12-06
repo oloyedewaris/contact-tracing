@@ -1,5 +1,5 @@
 import React, { useState, useContext, useRef } from 'react';
-import { Pressable, View, TouchableOpacity, ScrollView, Image, ToastAndroid } from 'react-native';
+import { Pressable, View, TouchableOpacity, ScrollView, Image, Platform, ActivityIndicator, Alert, ToastAndroid } from 'react-native';
 import CustomButton from '../../components/Button/CustomButton';
 import CustomInput from '../../components/Input/CustomInput';
 import styles from './styles';
@@ -16,6 +16,11 @@ import ImagePicker from 'react-native-image-crop-picker';
 import { updateProfileImage } from '../../context/actions/auth';
 import axiosInstance from '../../utils/axiosInstance';
 
+const cropOptions = {
+  width: moderateScale(130),
+  height: moderateScale(130),
+  cropping: true,
+}
 
 const Register = () => {
   const ref = useRef()
@@ -23,34 +28,44 @@ const Register = () => {
   const navigation = useNavigation<any>()
   const { authState, authDispatch } = useContext<any>(GlobalContext)
   const [isPassword, setIsPassword] = useState(true)
+  const [uploading, setUploading] = useState(false)
   const [error, setError] = useState(null)
   const [loading, setLoading] = useState(false)
   const [name, setName] = useState({ body: '', error: null })
   const [email, setEmail] = useState({ body: '', error: null })
   const [password, setPassword] = useState({ body: '', error: null })
 
+  const uploadImage = (image) => {
+    const file = {
+      name: `${image.modificationDate}.jpg`,
+      type: image.mime,
+      uri: Platform.OS === "android" ? image.path : image.path.replace("file://", "")
+    }
+
+    // setUploading(true)
+    // axiosInstance.post('/upload', { file })
+    //   .then(res => {
+    //     console.log(res.data)
+    //     setUploading(false)
+    //     // updateProfileImage(image)(authDispatch)
+    //     // ref.current.close()
+    //     // return res.data.file
+    //   })
+    //   .catch(err => {
+    //     setUploading(false)
+    //     console.log(err.response?.data)
+    //     Alert.alert('Upload Error', 'File was unable to upload, please try again later')
+    //   })
+  }
+
   const handlePicker = (option) => {
     if (option === 'picture') {
-      ImagePicker.openCamera({
-        width: moderateScale(130),
-        height: moderateScale(130),
-        cropping: true,
-      })
-        .then(image => {
-          updateProfileImage(image)(authDispatch)
-          ref.current.close()
-        })
-        .catch(er => ToastAndroid.show('Something went wrong', ToastAndroid.SHORT))
+      ImagePicker.openCamera(cropOptions)
+        .then(image => uploadImage(image))
+        .catch(err => ToastAndroid.show('Something went wrong', ToastAndroid.SHORT))
     } else {
-      ImagePicker.openPicker({
-        width: moderateScale(130),
-        height: moderateScale(130),
-        cropping: true
-      })
-        .then(image => {
-          updateProfileImage(image)(authDispatch)
-          ref.current.close()
-        })
+      ImagePicker.openPicker(cropOptions)
+        .then(image => uploadImage(image))
         .catch(err => ToastAndroid.show('Something went wrong', ToastAndroid.SHORT))
     }
   }
@@ -91,13 +106,16 @@ const Register = () => {
     <ScrollView>
       <View style={styles.mainPagecontainer}>
         <View style={{ width: '100%', height: moderateScale(140), flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
-          <Image style={styles.welcomeTopImage} resizeMode='stretch'
-            source={authState.userProfileImage ? { uri: authState.userProfileImage.path } : require('../../assets/avatar.jpeg')} />
           <TouchableOpacity onPress={() => ref.current.open()}>
+            {uploading ? (
+              <ActivityIndicator />
+            ) : (
+              <Image style={styles.welcomeTopImage} resizeMode='stretch'
+                source={authState.userProfileImage ? { uri: authState.userProfileImage.path } : require('../../assets/avatar.jpeg')} />
+            )}
             <CustomText style={{ color: imageError ? 'red' : colors.primary }}>{imageError || 'Choose Profile Image'}</CustomText>
           </TouchableOpacity>
         </View>
-        <CustomText style={styles.welcomeText}>Welcome to Tracker</CustomText>
         <CustomText style={styles.subWelcomeText}>Create a Free Account</CustomText>
         <CustomInput
           error={name.error}

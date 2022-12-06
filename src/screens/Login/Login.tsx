@@ -55,7 +55,6 @@ const Login = () => {
         <View style={{ width: '100%', height: moderateScale(140), flexDirection: 'row', justifyContent: 'center' }}>
           <Image style={styles.welcomeTopImage} source={require('../../assets/download.jpg')} resizeMode='stretch' />
         </View>
-        <CustomText style={styles.welcomeText}>Welcome to Tracker</CustomText>
         <CustomText style={styles.subWelcomeText}>Login Here</CustomText>
         <CustomInput
           error={email.error}

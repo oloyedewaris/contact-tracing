@@ -17,8 +17,6 @@ axiosInstance.interceptors.request.use(
     if (token)
       config.headers['x-auth-token'] = JSON.parse(token)
 
-    console.log(config.headers['x-auth-token'])
-
     return config;
   },
   (error) => {

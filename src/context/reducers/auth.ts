@@ -25,7 +25,6 @@ const auth = (state, action) => {
       }
       AsyncStorage.setItem('app', JSON.stringify(app))
       AsyncStorage.setItem('token', JSON.stringify(action.payload.token))
-      console.log()
       return app
     case UPDATE_USER:
       app = {
