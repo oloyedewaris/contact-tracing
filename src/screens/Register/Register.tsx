@@ -15,6 +15,7 @@ import BottomSheet from '../../components/BottomSheet/BottomSheet'
 import ImagePicker from 'react-native-image-crop-picker';
 import { updateProfileImage } from '../../context/actions/auth';
 import axiosInstance from '../../utils/axiosInstance';
+import axios from 'axios';
 
 const cropOptions = {
   width: moderateScale(130),
@@ -24,7 +25,8 @@ const cropOptions = {
 
 const Register = () => {
   const ref = useRef()
-  const [imageError, setImgeError] = useState('')
+  const [imageError, setImageError] = useState('')
+  const [imageUrl, setImageUrl] = useState(null)
   const navigation = useNavigation<any>()
   const { authState, authDispatch } = useContext<any>(GlobalContext)
   const [isPassword, setIsPassword] = useState(true)
@@ -35,27 +37,35 @@ const Register = () => {
   const [email, setEmail] = useState({ body: '', error: null })
   const [password, setPassword] = useState({ body: '', error: null })
 
-  const uploadImage = (image) => {
+  const uploadImage = async (image) => {
+    ref.current.close()
     const file = {
-      name: `${image.modificationDate}.jpg`,
+      name: `image${image.modificationDate}.${image.path.split('.')[1]}`,
       type: image.mime,
-      uri: Platform.OS === "android" ? image.path : image.path.replace("file://", "")
+      uri: image.path
+    }
+    const dataToUpload = new FormData()
+    dataToUpload.append('file', file)
+    dataToUpload.append("upload_preset", "contact-raising")
+    dataToUpload.append('cloud_name', 'dx9hqtncs')
+    const headers = {
+      headers: {
+        "Content-Type": "multipart/form-data",
+        "Accept": "application/json, text/plain, /"
+      }
     }
 
-    // setUploading(true)
-    // axiosInstance.post('/upload', { file })
-    //   .then(res => {
-    //     console.log(res.data)
-    //     setUploading(false)
-    //     // updateProfileImage(image)(authDispatch)
-    //     // ref.current.close()
-    //     // return res.data.file
-    //   })
-    //   .catch(err => {
-    //     setUploading(false)
-    //     console.log(err.response?.data)
-    //     Alert.alert('Upload Error', 'File was unable to upload, please try again later')
-    //   })
+    setUploading(true)
+    axios.post('https://api.cloudinary.com/v1_1/dx9hqtncs/image/upload', dataToUpload, headers)
+      .then(res => {
+        setImageUrl(res.data.url)
+        updateProfileImage(image)(authDispatch)
+        setUploading(false)
+      })
+      .catch(err => {
+        setUploading(false)
+        Alert.alert('Upload Error', 'File was unable to upload, please try again later')
+      })
   }
 
   const handlePicker = (option) => {
@@ -74,7 +84,7 @@ const Register = () => {
 
   const handleSubmit = () => {
     if (!authState.userProfileImage) {
-      setImgeError('Please add your profile image')
+      setImageError('Please add your profile image')
     } else if (!name.body || !email.body || !password.body || password.body.length < 6 || !validateEmail(email.body)) {
       if (!name.body) setName(name => ({ ...name, error: 'Name is required' }))
       if (!email.body) setEmail(email => ({ ...email, error: 'Email is required' }))
@@ -86,7 +96,7 @@ const Register = () => {
         name: name.body,
         email: email.body,
         password: password.body,
-        image: 'gibberish'
+        image: imageUrl
       }
       setLoading(true)
       setError(null)
