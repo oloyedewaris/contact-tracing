@@ -2,7 +2,6 @@ import React, { useEffect, useContext, useState } from 'react';
 import { StatusBar, View, ActivityIndicator } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import PushNotification from 'react-native-push-notification';
-// import SplashScreen from 'react-native-splash-screen';
 import HomeNavigator from './HomeNavigator';
 import { GlobalContext } from '../context/Provider';
 import AuthNavigator from './AuthNavigator';
