@@ -75,7 +75,7 @@ didReceiveNotificationResponse:(UNNotificationResponse *)response
 #endif
 
   NSDictionary *initProps = [self prepareInitialProps];
-  UIView *rootView = RCTAppSetupDefaultRootView(bridge, @"ContactRaising", initProps);
+  UIView *rootView = RCTAppSetupDefaultRootView(bridge, @"ContactTracing", initProps);
 
   if (@available(iOS 13.0, *)) {
     rootView.backgroundColor = [UIColor systemBackgroundColor];

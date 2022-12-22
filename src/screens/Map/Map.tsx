@@ -1,7 +1,7 @@
 import React, { useEffect, useCallback, useContext, useState } from 'react';
 import MapView, { Marker } from 'react-native-maps';
-import { View, Image, ToastAndroid, TouchableOpacity, ActivityIndicator } from 'react-native';
-import { ScaledSheet } from 'react-native-size-matters';
+import { View, Image, ToastAndroid, Button, TouchableOpacity, ActivityIndicator } from 'react-native';
+import { ScaledSheet, moderateScale } from 'react-native-size-matters';
 import PushNotification from 'react-native-push-notification';
 import CustomIcon from '../../components/Icon/CustomIcon';
 import axios from 'axios';
@@ -17,10 +17,15 @@ const Map = ({ navigation }) => {
   const { authDispatch } = useContext(GlobalContext)
   const [locationName, setLocationName] = useState('')
   const [locationData, setLocationData] = useState(null)
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState(null)
 
-  useFocusEffect(
-    useCallback(() => {
-      getLocation(async (location) => {
+  const callLocation = () => {
+    setLoading(true)
+    setError(null)
+    getLocation(
+      async (location) => {
+        console.log(location)
         PushNotification.localNotification({
           channelId: 'budget',
           id: 1,
@@ -44,6 +49,8 @@ const Map = ({ navigation }) => {
           longitude: location.coords.longitude,
           latitude: location.coords.latitude
         })
+        setError(null)
+        setLoading(false)
         const geoApiKey = 'pk.7271c180015d2571b70b96cd69f894ec';
         const latitude = location.coords.latitude.toString()
         const longitude = location.coords.longitude.toString()
@@ -67,8 +74,16 @@ const Map = ({ navigation }) => {
           console.log(err)
           ToastAndroid.show('update location error', ToastAndroid.SHORT)
         }
+      },
+      (error) => {
+        setError(error)
+        console.log(error)
+        setLoading(false)
       })
-    }, [])
+  }
+
+  useFocusEffect(
+    useCallback(callLocation, [])
   )
 
   return (
@@ -85,7 +100,13 @@ const Map = ({ navigation }) => {
           <CustomIcon name='cog' size={18} />
         </TouchableOpacity>
       </View>
-      {locationData ? (
+      {loading && (
+        <View style={{ justifyContent: 'center', alignItems: 'center', height: '80%', width: '100%' }}>
+          <ActivityIndicator color={colors.primary} size='large' />
+          <CustomText>Fetching Location Data</CustomText>
+        </View>
+      )}
+      {(!loading && locationData) && (
         <MapView
           style={styles.map}
           region={locationData}
@@ -96,10 +117,11 @@ const Map = ({ navigation }) => {
             </View>
           </Marker>
         </MapView>
-      ) : (
+      )}
+      {error && (
         <View style={{ justifyContent: 'center', alignItems: 'center', height: '80%', width: '100%' }}>
-          <ActivityIndicator color={colors.primary} size='large' />
-          <CustomText>Fetching Location Data</CustomText>
+          <CustomText style={{ marginBottom: moderateScale(10), fontWeight: '500' }}>An error occurred while getting location, please try again</CustomText>
+          <Button onPress={callLocation} title='Reload' color={colors.primary} size='large' />
         </View>
       )}
     </View>
